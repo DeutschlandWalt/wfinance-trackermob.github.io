@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>W | Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cinzel:wght@400;700&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --gold: #C6A961;
+      --burgundy: #800020;
+      --ivory: #F8F4E9;
+      --mahogany: #4A0100;
+      --charcoal: #333333;
+      --cream: #FFFDF5;
+    }
+
+    /* Глобальные стили */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--ivory);
+      color: var(--charcoal);
+      margin: 0;
+      padding: 0;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* Фиксированный хедер */
+    .mobile-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--burgundy);
+      padding: 12px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .mobile-logo {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      color: var(--ivory);
+      margin: 0;
+    }
+
+    .mobile-nav-btn {
+      background: var(--gold);
+      color: var(--charcoal);
+      border: none;
+      padding: 8px 12px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.9rem;
+      border-radius: 4px;
+    }
+
+    /* Основной контент */
+    .mobile-main {
+      padding: 70px 15px 20px;
+      max-width: 100%;
+    }
+
+    /* Карточки */
+    .mobile-card {
+      background: var(--cream);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Баланс */
+    .mobile-balance-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .mobile-balance-card {
+      padding: 12px;
+      text-align: center;
+      background: var(--cream);
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+    }
+
+    .mobile-balance-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      color: var(--burgundy);
+      margin: 0 0 5px;
+    }
+
+    .mobile-amount {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .income .mobile-amount {
+      color: #2a5a2a;
+    }
+
+    .expense .mobile-amount {
+      color: var(--burgundy);
+    }
+
+    /* Таблица транзакций */
+    .mobile-transactions {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .mobile-transactions th {
+      background: var(--burgundy);
+      color: var(--ivory);
+      padding: 10px;
+      text-align: left;
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+    }
+
+    .mobile-transactions td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(200, 169, 97, 0.3);
+    }
+
+    .mobile-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+    }
+
+    .income-badge {
+      background: rgba(40, 100, 40, 0.1);
+      color: #2a5a2a;
+      border: 1px solid rgba(40, 100, 40, 0.3);
+    }
+
+    .expense-badge {
+      background: rgba(128, 0, 32, 0.1);
+      color: var(--burgundy);
+      border: 1px solid rgba(128, 0, 32, 0.3);
+    }
+
+    .mobile-delete-btn {
+      background: none;
+      border: none;
+      color: var(--burgundy);
+      padding: 0;
+    }
+
+    /* График */
+    .mobile-chart-container {
+      height: 200px;
+      margin: 15px 0;
+    }
+
+    /* To-Do List */
+    .mobile-todo-form {
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+    .mobile-todo-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--gold);
+      background: var(--ivory);
+      border-radius: 4px 0 0 4px;
+    }
+
+    .mobile-todo-submit {
+      background: var(--burgundy);
+      color: var(--ivory);
+      border: none;
+      padding: 0 15px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .mobile-todo-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .mobile-todo-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(200, 169, 97, 0.3);
+    }
+
+    .mobile-todo-text {
+      flex: 1;
+      margin-left: 8px;
+    }
+
+    .mobile-todo-delete {
+      background: none;
+      border: none;
+      color: var(--burgundy);
+      padding: 5px;
+    }
+
+    /* Модальное окно */
+    .mobile-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      padding: 15px;
+    }
+
+    .mobile-modal-content {
+      background: var(--cream);
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .mobile-modal-title {
+      font-family: 'Playfair Display', serif;
+      color: var(--burgundy);
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+
+    .mobile-form-group {
+      margin-bottom: 15px;
+    }
+
+    .mobile-form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--gold);
+      background: var(--ivory);
+      border-radius: 4px;
+    }
+
+    .mobile-form-label {
+      display: block;
+      margin-bottom: 5px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.9rem;
+    }
+
+    .mobile-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .mobile-btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.9rem;
+    }
+
+    .mobile-btn-primary {
+      background: var(--burgundy);
+      color: var(--ivory);
+    }
+
+    /* Табы */
+    .mobile-tabs {
+      display: flex;
+      margin-bottom: 15px;
+      border-bottom: 1px solid var(--gold);
+    }
+
+    .mobile-tab {
+      padding: 10px 15px;
+      font-family: 'Cinzel', serif;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--mahogany);
+    }
+
+    .mobile-tab.active {
+      border-bottom-color: var(--burgundy);
+      color: var(--burgundy);
+    }
+
+    .mobile-tab-content {
+      display: none;
+    }
+
+    .mobile-tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- Фиксированный хедер -->
+  <header class="mobile-header">
+    <h1 class="mobile-logo">W | Finance Tracker</h1>
+    <button id="themeToggle" class="theme-btn">🌙</button>
+    <button id="mobileAddBtn" class="mobile-nav-btn">+ Добавить</button>
+  </header>
+
+  <!-- Основной контент -->
+  <main class="mobile-main">
+    <!-- Табы -->
+    <div class="mobile-tabs">
+      <button class="mobile-tab active" data-tab="finance">Финансы</button>
+      <button class="mobile-tab" data-tab="todo">To-Do</button>
+    </div>
+
+    <!-- Финансы -->
+    <div id="financeTab" class="mobile-tab-content active">
+      <div class="mobile-card">
+        <div class="mobile-balance-grid">
+          <div class="mobile-balance-card">
+            <h3 class="mobile-balance-title">Баланс</h3>
+            <p class="mobile-amount" id="mobileTotalBalance">0 $</p>
+          </div>
+          <div class="mobile-balance-card income">
+            <h3 class="mobile-balance-title">Доходы</h3>
+            <p class="mobile-amount" id="mobileTotalIncome">0 $</p>
+          </div>
+          <div class="mobile-balance-card expense">
+            <h3 class="mobile-balance-title">Расходы</h3>
+            <p class="mobile-amount" id="mobileTotalExpense">0 $</p>
+          </div>
+        </div>
+
+        <div class="mobile-chart-container">
+          <canvas id="mobileFinanceChart"></canvas>
+        </div>
+      </div>
+
+      <div class="mobile-card">
+        <table class="mobile-transactions" id="mobileTransactionsTable">
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Категория</th>
+              <th>Сумма</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- To-Do List -->
+    <div id="todoTab" class="mobile-tab-content">
+      <div class="mobile-card">
+        <form id="mobileTodoForm" class="mobile-todo-form">
+          <input type="text" id="mobileTodoInput" class="mobile-todo-input" placeholder="Новая задача..." required>
+          <button type="submit" class="mobile-todo-submit">+</button>
+        </form>
+        <ul class="mobile-todo-list" id="mobileTodoList"></ul>
+      </div>
+    </div>
+  </main>
+
+  <!-- Модальное окно добавления транзакции -->
+  <div class="mobile-modal" id="mobileTransactionModal">
+    <div class="mobile-modal-content">
+      <h2 class="mobile-modal-title">Новая операция</h2>
+      <form id="mobileTransactionForm">
+        <div class="mobile-form-group">
+          <label class="mobile-form-label">Тип</label>
+          <select id="mobileType" class="mobile-form-control" required>
+            <option value="income">Доход</option>
+            <option value="expense">Расход</option>
+          </select>
+        </div>
+        <div class="mobile-form-group">
+          <label class="mobile-form-label">Сумма ($)</label>
+          <input type="number" id="mobileAmount" class="mobile-form-control" required>
+        </div>
+        <div class="mobile-form-group">
+          <label class="mobile-form-label">Категория</label>
+          <input type="text" id="mobileCategory" class="mobile-form-control" required>
+        </div>
+        <div class="mobile-form-group">
+          <label class="mobile-form-label">Дата</label>
+          <input type="date" id="mobileDate" class="mobile-form-control" required>
+        </div>
+        <div class="mobile-form-actions">
+          <button type="button" id="mobileCancelBtn" class="mobile-btn">Отмена</button>
+          <button type="submit" class="mobile-btn mobile-btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Данные приложения
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    let todos = JSON.parse(localStorage.getItem('todos')) || [];
+    let mobileFinanceChart;
+
+    // DOM элементы
+    const mobileAddBtn = document.getElementById('mobileAddBtn');
+    const mobileModal = document.getElementById('mobileTransactionModal');
+    const mobileForm = document.getElementById('mobileTransactionForm');
+    const mobileCancelBtn = document.getElementById('mobileCancelBtn');
+    const mobileTransactionsBody = document.querySelector('#mobileTransactionsTable tbody');
+    const mobileTotalBalance = document.getElementById('mobileTotalBalance');
+    const mobileTotalIncome = document.getElementById('mobileTotalIncome');
+    const mobileTotalExpense = document.getElementById('mobileTotalExpense');
+    const mobileTodoForm = document.getElementById('mobileTodoForm');
+    const mobileTodoInput = document.getElementById('mobileTodoInput');
+    const mobileTodoList = document.getElementById('mobileTodoList');
+    const tabs = document.querySelectorAll('.mobile-tab');
+    const tabContents = document.querySelectorAll('.mobile-tab-content');
+
+    // Инициализация приложения
+    function initMobileApp() {
+      renderMobileTransactions();
+      updateMobileBalance();
+      initMobileChart();
+      renderMobileTodos();
+      setupEventListeners();
+    }
+
+    // Настройка обработчиков событий
+    function setupEventListeners() {
+      // Открытие модального окна
+      mobileAddBtn.addEventListener('click', () => {
+        mobileModal.style.display = 'flex';
+        document.getElementById('mobileDate').valueAsDate = new Date();
+      });
+
+      // Закрытие модального окна
+      mobileCancelBtn.addEventListener('click', () => {
+        mobileModal.style.display = 'none';
+      });
+
+      mobileModal.addEventListener('click', (e) => {
+        if (e.target === mobileModal) {
+          mobileModal.style.display = 'none';
+        }
+      });
+
+      // Добавление транзакции
+      mobileForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const transaction = {
+          id: Date.now(),
+          type: document.getElementById('mobileType').value,
+          amount: +document.getElementById('mobileAmount').value,
+          category: document.getElementById('mobileCategory').value,
+          date: document.getElementById('mobileDate').value
+        };
+        
+        transactions.push(transaction);
+        saveTransactions();
+        renderMobileTransactions();
+        updateMobileBalance();
+        updateMobileChart();
+        mobileModal.style.display = 'none';
+        mobileForm.reset();
+      });
+
+      // Добавление задачи
+      mobileTodoForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const todo = {
+          id: Date.now(),
+          text: mobileTodoInput.value,
+          completed: false
+        };
+        
+        todos.push(todo);
+        saveTodos();
+        renderMobileTodos();
+        mobileTodoInput.value = '';
+      });
+
+      // Переключение табов
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(c => c.classList.remove('active'));
+          
+          tab.classList.add('active');
+          document.getElementById(`${tab.dataset.tab}Tab`).classList.add('active');
+        });
+      });
+    }
+
+    // Сохранение данных
+    function saveTransactions() {
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+    }
+
+    function saveTodos() {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
+
+    // Отрисовка транзакций
+    function renderMobileTransactions() {
+      mobileTransactionsBody.innerHTML = transactions.map(transaction => `
+        <tr>
+          <td>${formatMobileDate(transaction.date)}</td>
+          <td>${transaction.category}</td>
+          <td>
+            <span class="mobile-badge ${transaction.type}-badge">
+              ${transaction.type === 'income' ? '+' : '-'}${transaction.amount} $
+            </span>
+          </td>
+          <td>
+            <button class="mobile-delete-btn" data-id="${transaction.id}">✕</button>
+          </td>
+        </tr>
+      `).join('');
+
+      // Удаление транзакций
+      document.querySelectorAll('.mobile-delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          transactions = transactions.filter(t => t.id !== +e.target.dataset.id);
+          saveTransactions();
+          renderMobileTransactions();
+          updateMobileBalance();
+          updateMobileChart();
+        });
+      });
+    }
+
+    // Отрисовка задач
+    function renderMobileTodos() {
+      mobileTodoList.innerHTML = todos.map(todo => `
+        <li class="mobile-todo-item">
+          <input type="checkbox" ${todo.completed ? 'checked' : ''} data-id="${todo.id}">
+          <span class="mobile-todo-text" style="${todo.completed ? 'text-decoration: line-through; opacity: 0.7;' : ''}">
+            ${todo.text}
+          </span>
+          <button class="mobile-todo-delete" data-id="${todo.id}">✕</button>
+        </li>
+      `).join('');
+
+      // Удаление задач
+      document.querySelectorAll('.mobile-todo-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          todos = todos.filter(t => t.id !== +e.target.dataset.id);
+          saveTodos();
+          renderMobileTodos();
+        });
+      });
+
+      // Переключение статуса задачи
+      document.querySelectorAll('.mobile-todo-item input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+          const todo = todos.find(t => t.id === +e.target.dataset.id);
+          if (todo) {
+            todo.completed = e.target.checked;
+            saveTodos();
+            renderMobileTodos();
+          }
+        });
+      });
+    }
+
+    // Обновление баланса
+    function updateMobileBalance() {
+      const income = transactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+      
+      const expense = transactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+      
+      const balance = income - expense;
+      
+      mobileTotalIncome.textContent = `${income} $`;
+      mobileTotalExpense.textContent = `${expense} $`;
+      mobileTotalBalance.textContent = `${balance} $`;
+    }
+
+    // Форматирование даты
+    function formatMobileDate(dateString) {
+      const date = new Date(dateString);
+      return `${date.getDate()}.${date.getMonth() + 1}`;
+    }
+
+    // График
+    function initMobileChart() {
+      const ctx = document.getElementById('mobileFinanceChart').getContext('2d');
+      
+      mobileFinanceChart = new Chart(ctx, {
+        type: 'bar',
+        data: getMobileChartData(),
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true },
+            x: { grid: { display: false } }
+          },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                font: { family: 'Cinzel' }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function getMobileChartData() {
+      const last7Days = [...Array(7)].map((_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        return d.toISOString().split('T')[0];
+      }).reverse();
+
+      return {
+        labels: last7Days.map(date => formatMobileDate(date)),
+        datasets: [
+          {
+            label: 'Доходы',
+            data: last7Days.map(date => 
+              transactions
+                .filter(t => t.date === date && t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0)
+            ),
+            backgroundColor: '#2a5a2a',
+            borderColor: '#2a5a2a',
+            borderWidth: 1
+          },
+          {
+            label: 'Расходы',
+            data: last7Days.map(date => 
+              transactions
+                .filter(t => t.date === date && t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0)
+            ),
+            backgroundColor: '#800020',
+            borderColor: '#800020',
+            borderWidth: 1
+          }
+        ]
+      };
+    }
+
+    function updateMobileChart() {
+      mobileFinanceChart.data = getMobileChartData();
+      mobileFinanceChart.update();
+    }
+
+    // Меняем текст кнопки
+        const themeBtn = document.getElementById('themeToggle');
+    if (document.body.classList.contains('dark-mode')) {
+      themeBtn.textContent = '☀️';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      themeBtn.textContent = '🌙';
+      localStorage.setItem('theme', 'light');
+    }
+  
+
+  // Проверяем сохранённую тему при загрузке
+  window.onload = function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+      document.getElementById('themeToggle').textContent = '☀️';
+    }
+    
+    // Вешаем обработчик на кнопку
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+  };
+    // Запуск приложения
+    document.addEventListener('DOMContentLoaded', initMobileApp);
+  </script>
+</body>
+</html>
